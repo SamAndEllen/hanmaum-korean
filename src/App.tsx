@@ -1,84 +1,43 @@
-import * as React from 'react';
-import styled from 'styled-components/native';
-import Voice from 'react-native-voice';
+import React, { Component } from 'react';
+import Speech from './Speech';
+import Tts from './Tts';
 
+import styled from 'styled-components/native';
 const Container = styled.View`
   flex: 1;
-  justify-content: center;
   align-items: center;
   background-color: #f5fcff;
 `;
-const ButtonRecord = styled.Button``;
-const VoiceText = styled.Text`
-  margin: 32px;
-`;
-interface Props {}
-interface State {
-  isRecord: boolean;
-  voice: string;
-}
-export default class App extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
 
-    this.state = {
-      isRecord: false,
-      voice: undefined,
-    };
+import { COLOR, ThemeContext, getTheme, Toolbar } from 'react-native-material-ui';
 
-    Voice.onSpeechStart = this._onSpeechStart;
-    Voice.onSpeechEnd = this._onSpeechEnd;
-    Voice.onSpeechResults = this._onSpeechResults;
-    Voice.onSpeechError = this._onSpeechError;
+// you can set your style right here, it'll be propagated to application
+const uiTheme = {
+  fontFamily: 'System',
+  palette: {
+    primaryColor: COLOR.blue800,
+  },
+  toolbar: {
+    container: {
+      height: 80,
+      paddingTop: 30,
+      marginBottom: 30
+    },
   }
+};
+
+export default class Main extends Component {
   render() {
-    const { isRecord, voice } = this.state;
-    const buttonLabel = isRecord ? 'Stop' : 'Start';
-    const voiceLabel = voice
-      ? voice
-      : isRecord
-      ? 'Say something...'
-      : 'press Start button';
     return (
-      <Container>
-        <VoiceText>{voiceLabel}</VoiceText>
-        <ButtonRecord onPress={this._onRecordVoice} title={buttonLabel} />
-      </Container>
+      <ThemeContext.Provider value={getTheme(uiTheme)}>
+        <Container>
+        <Toolbar
+          centerElement="Korean Language"
+        />
+          <Speech />
+          <Tts />
+        </Container>
+      </ThemeContext.Provider>
     );
   }
-  componentWillUnmount() {
-    Voice.destroy().then(Voice.removeAllListeners);
-  }
-
-  private _onSpeechStart = event => {
-    console.log('onSpeechStart');
-    this.setState({
-      voice: '',
-    });
-  };
-  private _onSpeechEnd = event => {
-    console.log('onSpeechEnd');
-  };
-  private _onSpeechResults = event => {
-    console.log('onSpeechResults');
-    this.setState({
-      voice: event.value[0],
-    });
-  };
-  private _onSpeechError = event => {
-    console.log('_onSpeechError');
-    console.log(event.error);
-  };
-
-  private _onRecordVoice = () => {
-    const { isRecord } = this.state;
-    if (isRecord) {
-      Voice.stop();
-    } else {
-      Voice.start('en-US');
-    }
-    this.setState({
-      isRecord: !isRecord,
-    });
-  };
 }

@@ -76,10 +76,14 @@ export default class App extends React.Component<Props, State> {
   private _onSpeechStart = event => {
     console.log('onSpeechStart');
     this.setState({
+      state: VoiceState.Record,
       voice: '',
     });
   };
   private _onSpeechEnd = event => {
+    this.setState({
+      state: VoiceState.Normal
+    })
     console.log('onSpeechEnd');
   };
   private _onSpeechResults = event => {
@@ -99,9 +103,6 @@ export default class App extends React.Component<Props, State> {
       Voice.stop();
     } else {
       Voice.start('ko-KR');
-      this.setState({
-        state: VoiceState.Record,
-      });
     }
   };
 

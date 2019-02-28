@@ -42,12 +42,12 @@ export default class App extends React.Component<Props, State> {
   }
 
   render() {
-    const { isRecord, voice } = this.state;
-    const buttonLabel = isRecord ? '중지' : '읽기평가';
-    const buttonIcon = isRecord ? 'mic-off' : 'mic';
+    const { state, voice } = this.state;
+    const buttonLabel = (state === VoiceState.Record) ? '중지' : '읽기평가';
+    const buttonIcon = (state === VoiceState.Record) ? 'mic-off' : 'mic';
     const voiceLabel = voice
       ? voice
-      : isRecord
+      : (state === VoiceState.Record)
       ? '무엇이든 말해보세요...'
       : 'press Start button';
 
@@ -94,14 +94,14 @@ export default class App extends React.Component<Props, State> {
   };
 
   private _onRecordVoice = () => {
-    const { isRecord } = this.state;
-    if (isRecord) {
+    const { state } = this.state;
+    if (state != VoiceState.Normal) {
       Voice.stop();
     } else {
       Voice.start('ko-KR');
     }
     this.setState({
-      isRecord: !isRecord,
+      state: VoiceState.Record,
     });
   };
 

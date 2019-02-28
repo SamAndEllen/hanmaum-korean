@@ -59,10 +59,16 @@ export default class App extends React.Component<Props, State> {
         {/* <Text>{voiceLabel}</Text> */}
         <View style={styles.rowContainer}>
             <View style={styles.button}>
-              <Button primary icon="radio" onPress={this._onOriginListen} text="원본 듣기연습" />
+              <Button
+              primary={(state !== VoiceState.Record)}
+              disabled={(state === VoiceState.Record)}
+              icon="radio" onPress={this._onOriginListen} text="원본 듣기연습" />
             </View>
             <View style={styles.button}>
-              <Button primary icon={buttonIcon} onPress={this._onRecordVoice} text={buttonLabel} />
+              <Button
+              primary={(state !== VoiceState.Listen)}
+              disabled={(state === VoiceState.Listen)}
+              icon={buttonIcon} onPress={this._onRecordVoice} text={buttonLabel} />
             </View>
         </View>
       </Card>

@@ -5,8 +5,15 @@ import Tts from 'react-native-tts';
 import { View, StyleSheet, Text } from 'react-native';
 import { Card, Button } from 'react-native-material-ui';
 
+enum VoiceState {
+  Normal, 
+  Record,
+  Listen
+}
+
 interface Props {}
 interface State {
+  state: VoiceState; 
   isRecord: boolean;
   voice: string;
   question: string;
@@ -16,6 +23,7 @@ export default class App extends React.Component<Props, State> {
     super(props);
 
     this.state = {
+      state: VoiceState.Normal,
       isRecord: false,
       voice: undefined,
       question: '',
@@ -98,14 +106,32 @@ export default class App extends React.Component<Props, State> {
   };
 
   private _onOriginListen = () => {
-    Tts.stop();
-    Tts.setDefaultLanguage('ko-KR');
-    Tts.getInitStatus().then(() => {
+    if(this.state.state != VoiceState.Record){
+      Tts.stop();
+      Tts.setDefaultLanguage('ko-KR');
+      Tts.getInitStatus().then(() => {
       Tts.speak(this.state.question);
     });
-    Tts.addEventListener('tts-start', (event) => console.log("start", event));
-    Tts.addEventListener('tts-finish', (event) => console.log("finish", event));
-    Tts.addEventListener('tts-cancel', (event) => console.log("cancel", event));
+    Tts.addEventListener('tts-start', (event) => {
+      console.log("start", event)
+      this.setState({
+        state: VoiceState.Listen
+      })
+    });
+    Tts.addEventListener('tts-finish', (event) => {
+      console.log("finish", event)
+      this.setState({
+        state: VoiceState.Normal
+      })
+    });
+    Tts.addEventListener('tts-cancel', (event) => {
+      console.log("cancel", event)
+      this.setState({
+        state: VoiceState.Normal
+      })
+    });
+    }
+    
   }
 }
 

@@ -99,10 +99,10 @@ export default class App extends React.Component<Props, State> {
       Voice.stop();
     } else {
       Voice.start('ko-KR');
+      this.setState({
+        state: VoiceState.Record,
+      });
     }
-    this.setState({
-      state: VoiceState.Record,
-    });
   };
 
   private _onOriginListen = () => {

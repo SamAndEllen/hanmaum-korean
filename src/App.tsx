@@ -35,7 +35,6 @@ export default class Main extends Component {
           centerElement="Korean Language"
         />
           <Speech />
-          <Tts />
         </Container>
       </ThemeContext.Provider>
     );

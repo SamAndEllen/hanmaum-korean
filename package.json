@@ -19,6 +19,7 @@
     "react-native-voice": "^0.2.6",
     "react-speech": "^0.3.2",
     "styled-components": "^4.1.3",
+    "text-diff": "^1.0.1",
     "typings-for-css-modules-loader": "^1.7.0"
   },
   "devDependencies": {

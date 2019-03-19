@@ -160,9 +160,9 @@ function ResultRender({question, voice}) {
           if (item[0] === 0) {
             return <Text key={idx} style={styles.successText}>{item[1]}</Text>
           } else if (item[0] === 1) {
-            return <Text key={idx} style={styles.errorText}>{item[1]}</Text> 
-          }else {
             return <Text key={idx} style={styles.errorText}>{item[1][1]}</Text> 
+          }else {
+            return <Text key={idx} style={styles.errorText}>{item[1]}</Text> 
           }
         }
       )

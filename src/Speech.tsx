@@ -61,7 +61,7 @@ export default class App extends React.Component<Props, State> {
           <ResultRender question={question} voice={voice} />
         </Text>
         <View style={styles.rowContainer}>
-          <Text style={styles.scoreStyle}>{(voice !== "") ? Math.round(total) : ""}</Text>
+          <Text style={styles.scoreStyle}>{(voice !== "") ? Math.round(total)+" 점" : ""}</Text>
         </View>
         <View style={styles.rowContainer}>
           <View style={styles.button}>
@@ -97,23 +97,27 @@ export default class App extends React.Component<Props, State> {
   };
   private _onSpeechEnd = event => {
     console.log("onSpeechEnd");
+
+  };
+  private _onSpeechResults = event => {
+    console.log("onSpeechResults");
     const diff = new Diff();
     var result = "";
     var total = 0;
-    const textDiff = diff.main(this.state.question, this.state.voice);
+    const textDiff = diff.main(this.state.question, event.value[0]);
     const wordScore = 100 / this.state.question.length;
+    console.log("question", this.state.question);
+    console.log("voice", event.value[0]);
     textDiff.forEach(element => {
       if (element[0] === 0) {
         result += element[1];
         total += wordScore * element[1].length;
       }
     });
+    console.log("total", total);
     this.setState({
       total: total,
     });
-  };
-  private _onSpeechResults = event => {
-    console.log("onSpeechResults");
     this.setState({
       voice: event.value[0]
     });

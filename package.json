@@ -6,7 +6,11 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "ios": "react-native run-ios",
     "android": "react-native run-android",
-    "test": "jest"
+    "test": "jest",
+    "bundleIos": "react-native bundle --entry-file index.ios.js --platform ios --dev true --bundle-output ./bundle/ios/ios.dev.jsbundle --assets-dest ./bundle/ios --sourcemap-output ./bundle/ios/ios-source.map && node bundle/bin/bundleStatic.js",
+    "zipIos": "zip -r bundle.ios.zip bundle/ios/*",
+    "bundleAndroid": "react-native bundle --entry-file index.android.js --platform android --dev true --bundle-output ./bundle/android/android.dev.jsbundle --assets-dest ./bundle/android --sourcemap-output ./bundle/android/android-source.map && node bundle/bin/bundleStatic.js",
+    "zipAndroid": "zip -r bundle.android.zip bundle/android/*"
   },
   "dependencies": {
     "@material-ui/core": "^3.9.2",

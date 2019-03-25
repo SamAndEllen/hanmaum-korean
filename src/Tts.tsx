@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Tts from 'react-native-tts';
+import Diff from "text-diff";
 
 import { View, StyleSheet, Text, TextInput } from 'react-native';
 import { Card, Button } from 'react-native-material-ui';
@@ -9,6 +10,9 @@ interface State {
   isRecord: boolean;
   voice: string;
   question: string;
+  text: string;
+  total: number;
+  inputText: string;
 }
 export default class App extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -18,36 +22,66 @@ export default class App extends React.Component<Props, State> {
       isRecord: false,
       voice: undefined,
       question: '',
+      text: '',
+      total: 0,
+      inputText: '',
     };
   }
 
   componentWillMount() {
     this.setState({
-      question: '수 천년간 사람들은 자신들이 살고있는 세계에 대해 거의 알지 못했다. 산, 정글, 바다, 얼음으로 뒤덮힌 넓은 땅은 그들이 여행하기에 힘들게 만들었다.'
+      question: '수 천년간 사람들은 자신들이 살고있는 세계에 대해 거의 알지 못했다'
     });
   }
 
   render() {
-    const { isRecord, voice } = this.state;
+    const { isRecord, total, question, text, inputText } = this.state;
     const buttonLabel = isRecord ? '중지' : '읽기평가';
-    const voiceLabel = voice
-      ? voice
-      : isRecord
-      ? '무엇이든 말해보세요...'
-      : 'press Start button';
-
     return (
       <Card>
         <Text style={styles.titleStyle}>[ 한국어 받아쓰기 평가 ]</Text>
         <Text style={styles.subTtitleStyle}>1. 다음 녹음을 들으면서 그 내용을 입력(타이핑)하시오.</Text>
+        <View style={styles.rowContainer}>
         <Button primary icon="radio" onPress={this._onOriginListen} text="듣기평가" />
-        <View>
-          <UselessTextInputMultiline />
+        <Button primary icon="radio" onPress={this._onResult} text="듣기제출" />
         </View>
+        <Text style={styles.resultStyle}>
+          <ResultRender question={question} voice={text} />
+        </Text>
+        <View style={styles.rowContainer}>
+          <Text style={styles.scoreStyle}>{(text !== "") ? Math.round(total)+" 점" : ""}</Text>
+        </View>
+        
+        <View style={styles.uselessTextInput}
+     >
+       <TextInput
+         onChangeText={(inputText) => this.setState({inputText})}
+       />
+     </View>
       </Card>
     );
   }
   
+  private _onResult = () => {
+    const diff = new Diff();
+    var result = "";
+    var total = 0;
+    const textDiff = diff.main(this.state.question, this.state.inputText);
+    console.log(this.state.question);
+    console.log(this.state.inputText);
+    const wordScore = 100 / this.state.question.length;
+    textDiff.forEach(element => {
+      if (element[0] === 0) {
+        result += element[1];
+        total += wordScore * element[1].length;
+      }
+    });
+    console.log("total", total);
+    this.setState({
+      text: this.state.inputText,
+      total: total,
+    });
+  }
   private _onOriginListen = () => {
     Tts.stop();
     Tts.setDefaultLanguage('ko-KR');
@@ -59,6 +93,25 @@ export default class App extends React.Component<Props, State> {
     Tts.addEventListener('tts-finish', (event) => console.log("finish", event));
     Tts.addEventListener('tts-cancel', (event) => console.log("cancel", event));
   }
+}
+
+function ResultRender({question, voice}) {
+  const diff = new Diff();
+  const textDiff = (voice !== "") ? diff.main(question, voice) : [];
+  return (
+    <Text>{
+      textDiff.map((item, idx) => {
+          if (item[0] === 0) {
+            return <Text key={idx} style={styles.successText}>{item[1]}</Text>
+          } else if (item[0] === 1) {
+            return <Text key={idx} style={styles.errorText}>{item[1][1]}</Text> 
+          }else {
+            return <Text key={idx} style={styles.errorText}>{item[1]}</Text> 
+          }
+        }
+      )
+    }</Text>
+  );
 }
 
 class UselessTextInput extends React.Component {
@@ -87,11 +140,8 @@ class UselessTextInputMultiline extends React.Component {
     return (
      <View style={styles.uselessTextInput}
      >
-       <UselessTextInput
-         multiline = {true}
-         numberOfLines = {4}
+       <TextInput
          onChangeText={(text) => this.setState({text})}
-         value={this.state.text}
        />
      </View>
     );
@@ -116,5 +166,26 @@ const styles = StyleSheet.create({
       margin: 20,
       borderBottomColor: '#000000',
       borderBottomWidth: 2
+  },
+  rowContainer: {
+    margin: 8,
+    flexDirection: "row",
+    justifyContent: "center"
+  }, 
+  scoreStyle: {
+    marginLeft: 20,
+    marginRight: 20,
+    fontSize: 32,
+    fontWeight: "700",
+  },
+  resultStyle: {
+    margin: 20,
+    marginTop: 0,
+  },
+  successText: {
+    color: "#2196f3"
+  },
+  errorText: {
+    color: "#f44336"
   },
 });

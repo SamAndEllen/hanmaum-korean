@@ -8,7 +8,7 @@ const Container = styled.View`
   align-items: center;
   background-color: #f5fcff;
 `;
-
+import { ScrollView } from "react-native";
 import { COLOR, ThemeContext, getTheme, Toolbar } from 'react-native-material-ui';
 
 // you can set your style right here, it'll be propagated to application
@@ -34,8 +34,12 @@ export default class Main extends Component {
         <Toolbar
           centerElement="Korean Language"
         />
+        <ScrollView 
+        horizontal={false}
+        >
           <Speech />
           <Tts />
+          </ScrollView>
         </Container>
       </ThemeContext.Provider>
     );

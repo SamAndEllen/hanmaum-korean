@@ -19,9 +19,9 @@ export default class App extends React.Component<Props, State> {
 
     this.state = {
       isRecord: false,
-      voice: undefined,
+      voice: "",
       question: "",
-      total: 0
+      total: 0,
     };
 
     Voice.onSpeechStart = this._onSpeechStart;
@@ -38,7 +38,7 @@ export default class App extends React.Component<Props, State> {
   }
 
   render() {
-    const { isRecord, voice, total } = this.state;
+    const { isRecord, question, voice, total } = this.state;
     const buttonLabel = isRecord ? "중지" : "읽기평가";
     const buttonIcon = isRecord ? "mic-off" : "mic";
     const voiceLabel = voice
@@ -56,9 +56,13 @@ export default class App extends React.Component<Props, State> {
           1. 아래의 한국어 문장을 (필요하면 몇 번 들어본 후) 올바르게 발음하면서
           큰소리로 읽으시오.
         </Text>
-        <Text style={styles.contentStyle}>{this.state.question}</Text>
-        <Text>{voiceLabel}</Text>
-        <Text>{totalLabel}</Text>
+        <Text style={styles.contentStyle}>{question}</Text>
+        <Text style={styles.resultStyle}>
+          <ResultRender question={question} voice={voice} />
+        </Text>
+        <View style={styles.rowContainer}>
+          <Text style={styles.scoreStyle}>{(voice !== "") ? Math.round(total)+" 점" : ""}</Text>
+        </View>
         <View style={styles.rowContainer}>
           <View style={styles.button}>
             <Button
@@ -93,23 +97,27 @@ export default class App extends React.Component<Props, State> {
   };
   private _onSpeechEnd = event => {
     console.log("onSpeechEnd");
+
+  };
+  private _onSpeechResults = event => {
+    console.log("onSpeechResults");
     const diff = new Diff();
     var result = "";
     var total = 0;
-    const textDiff = diff.main(this.state.question, this.state.voice);
+    const textDiff = diff.main(this.state.question, event.value[0]);
     const wordScore = 100 / this.state.question.length;
+    console.log("question", this.state.question);
+    console.log("voice", event.value[0]);
     textDiff.forEach(element => {
       if (element[0] === 0) {
         result += element[1];
         total += wordScore * element[1].length;
       }
     });
+    console.log("total", total);
     this.setState({
-      total: total
+      total: total,
     });
-  };
-  private _onSpeechResults = event => {
-    console.log("onSpeechResults");
     this.setState({
       voice: event.value[0]
     });
@@ -143,7 +151,32 @@ export default class App extends React.Component<Props, State> {
   };
 }
 
+function ResultRender({question, voice}) {
+  const diff = new Diff();
+  const textDiff = (voice !== "") ? diff.main(question, voice) : [];
+  return (
+    <Text>{
+      textDiff.map((item, idx) => {
+          if (item[0] === 0) {
+            return <Text key={idx} style={styles.successText}>{item[1]}</Text>
+          } else if (item[0] === 1) {
+            return <Text key={idx} style={styles.errorText}>{item[1][1]}</Text> 
+          }else {
+            return <Text key={idx} style={styles.errorText}>{item[1]}</Text> 
+          }
+        }
+      )
+    }</Text>
+  );
+}
+
 const styles = StyleSheet.create({
+  successText: {
+    color: "#2196f3"
+  },
+  errorText: {
+    color: "#f44336"
+  },
   titleStyle: {
     fontSize: 20,
     fontWeight: "700",
@@ -170,5 +203,15 @@ const styles = StyleSheet.create({
   },
   button: {
     marginHorizontal: 8
+  },
+  resultStyle: {
+    margin: 20,
+    marginTop: 0,
+  },
+  scoreStyle: {
+    marginLeft: 20,
+    marginRight: 20,
+    fontSize: 32,
+    fontWeight: "700",
   }
 });

@@ -9,7 +9,7 @@
     "test": "jest",
     "bundleIos": "react-native bundle --entry-file index.ios.js --platform ios --dev true --bundle-output ./bundle/ios/ios.dev.jsbundle --assets-dest ./bundle/ios --sourcemap-output ./bundle/ios/ios-source.map && node bundle/bin/bundleStatic.js",
     "zipIos": "zip -r bundle.ios.zip bundle/ios/*",
-    "bundleAndroid": "react-native bundle --entry-file index.android.js --platform android --dev true --bundle-output ./bundle/android/android.dev.jsbundle --assets-dest ./bundle/android --sourcemap-output ./bundle/android/android-source.map && node bundle/bin/bundleStatic.js",
+    "bundleAndroid": "react-native bundle --entry-file index.js --platform android --dev true --bundle-output ./bundle/android/android.dev.jsbundle --assets-dest ./bundle/android --sourcemap-output ./bundle/android/android-source.map && node bundle/bin/bundleStatic.js",
     "zipAndroid": "zip -r bundle.android.zip bundle/android/*"
   },
   "dependencies": {
@@ -32,7 +32,6 @@
     "@types/styled-components": "^4.1.6",
     "babel-jest": "23.6.0",
     "babel-plugin-styled-components": "^1.10.0",
-    "jest": "23.6.0",
     "metro-react-native-babel-preset": "0.51.1",
     "react-test-renderer": "16.6.3",
     "typescript": "^3.2.4"

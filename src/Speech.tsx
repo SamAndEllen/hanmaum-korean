@@ -5,6 +5,7 @@ import Diff from "text-diff";
 
 import { View, StyleSheet, Text } from "react-native";
 import { Card, Button } from "react-native-material-ui";
+import { Dropdown } from "react-native-material-dropdown";
 
 interface Props {}
 interface State {
@@ -12,6 +13,7 @@ interface State {
   voice: string;
   question: string;
   total: number;
+  selectedSpeed: number;
 }
 export default class App extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -22,6 +24,7 @@ export default class App extends React.Component<Props, State> {
       voice: "",
       question: "",
       total: 0,
+      selectedSpeed: 0.6,
     };
 
     Voice.onSpeechStart = this._onSpeechStart;
@@ -38,7 +41,7 @@ export default class App extends React.Component<Props, State> {
   }
 
   render() {
-    const { isRecord, question, voice, total } = this.state;
+    const { isRecord, question, voice, total, selectedSpeed } = this.state;
     const buttonLabel = isRecord ? "중지" : "읽기평가";
     const buttonIcon = isRecord ? "mic-off" : "mic";
     const voiceLabel = voice
@@ -47,6 +50,19 @@ export default class App extends React.Component<Props, State> {
       ? "무엇이든 말해보세요..."
       : "press Start button";
     const totalLabel = Number(total.toFixed(1));
+    let speed = [{
+      label: 'x0.5',
+      value: 0.4
+    }, {
+      label: 'x1.0',
+      value: 0.6
+    }, {
+      label: 'x1.5',
+      value: 0.7
+    }, {
+      label: 'x2.0',
+      value: 0.8
+    }];
     return (
       <Card>
         <Text style={styles.titleStyle}>
@@ -64,6 +80,15 @@ export default class App extends React.Component<Props, State> {
           <Text style={styles.scoreStyle}>{(voice !== "") ? Math.round(total)+" 점" : ""}</Text>
         </View>
         <View style={styles.rowContainer}>
+        <View style={styles.dropdown}>
+          <Dropdown
+            label='Speed'
+            data={speed}
+            value={selectedSpeed}
+            onChangeText={this._onChangeText}
+            animationDuration={400}
+          />
+          </View>
           <View style={styles.button}>
             <Button
               primary
@@ -127,6 +152,12 @@ export default class App extends React.Component<Props, State> {
     console.log(event.error);
   };
 
+  private _onChangeText = (value) => {
+    this.setState({
+      selectedSpeed: value
+    });
+  }
+
   private _onRecordVoice = () => {
     const { isRecord } = this.state;
     if (isRecord) {
@@ -141,6 +172,8 @@ export default class App extends React.Component<Props, State> {
 
   private _onOriginListen = () => {
     Tts.stop();
+    console.log(this.state.selectedSpeed);
+    Tts.setDefaultRate(this.state.selectedSpeed);
     Tts.setDefaultLanguage("ko-KR");
     Tts.getInitStatus().then(() => {
       Tts.speak(this.state.question);
@@ -202,7 +235,12 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   button: {
-    marginHorizontal: 8
+    marginHorizontal: 5
+  },
+  dropdown: {
+    width: 80,
+    bottom: 25,
+    marginLeft: 15
   },
   resultStyle: {
     margin: 20,

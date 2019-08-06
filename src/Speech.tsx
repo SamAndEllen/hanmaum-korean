@@ -86,7 +86,6 @@ export default class App extends React.Component<Props, State> {
             data={speed}
             value={selectedSpeed}
             onChangeText={this._onChangeText}
-            animationDuration={400}
           />
           </View>
           <View style={styles.button}>

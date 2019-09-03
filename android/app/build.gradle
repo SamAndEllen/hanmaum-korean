@@ -141,6 +141,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-audio-recorder-player')
+    implementation project(':react-native-vector-icons')
     implementation "androidx.core:core:1.0.2"
     implementation "androidx.annotation:annotation:1.1.0"
     implementation project(':react-native-voice')

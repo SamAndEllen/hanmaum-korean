@@ -7,6 +7,9 @@ import { View, StyleSheet, Text } from "react-native";
 import { Card, Button } from "react-native-material-ui";
 import { Dropdown } from "react-native-material-dropdown";
 
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+
+
 interface Props {}
 interface State {
   isRecord: boolean;
@@ -16,6 +19,8 @@ interface State {
   selectedSpeed: number;
 }
 export default class App extends React.Component<Props, State> {
+  audioRecorderPlayer = new AudioRecorderPlayer();
+
   constructor(props: Props) {
     super(props);
 
@@ -94,6 +99,30 @@ export default class App extends React.Component<Props, State> {
               icon="radio"
               onPress={this._onOriginListen}
               text="원본 듣기연습"
+            />
+          </View>
+          <View style={styles.button}>
+            <Button
+              primary
+              icon="radio"
+              onPress={this.onStartRecord}
+              text="녹음하기"
+            />
+          </View>
+          <View style={styles.button}>
+            <Button
+              primary
+              icon="radio"
+              onPress={this.onStopRecord}
+              text="녹음정지"
+            />
+          </View>
+          <View style={styles.button}>
+            <Button
+              primary
+              icon="radio"
+              onPress={this.onStartPlay}
+              text="재생"
             />
           </View>
           <View style={styles.button}>
@@ -181,7 +210,60 @@ export default class App extends React.Component<Props, State> {
     Tts.addEventListener("tts-finish", event => console.log("finish", event));
     Tts.addEventListener("tts-cancel", event => console.log("cancel", event));
   };
+
+  onStartRecord = async () => {
+    const result = await this.audioRecorderPlayer.startRecorder();
+    this.audioRecorderPlayer.addRecordBackListener((e) => {
+      this.setState({
+        recordSecs: e.current_position,
+        recordTime: this.audioRecorderPlayer.mmssss(Math.floor(e.current_position)),
+      });
+      return;
+    });
+    console.log(result);
+  }
+  
+  onStopRecord = async () => {
+    const result = await this.audioRecorderPlayer.stopRecorder();
+    this.audioRecorderPlayer.removeRecordBackListener();
+    this.setState({
+      recordSecs: 0,
+    });
+    console.log(result);
+  }
+  
+  onStartPlay = async () => {
+    console.log('onStartPlay');
+    const msg = await this.audioRecorderPlayer.startPlayer();
+    console.log(msg);
+    this.audioRecorderPlayer.addPlayBackListener((e) => {
+      if (e.current_position === e.duration) {
+        console.log('finished');
+        this.audioRecorderPlayer.stopPlayer();
+      }
+      this.setState({
+        currentPositionSec: e.current_position,
+        currentDurationSec: e.duration,
+        playTime: this.audioRecorderPlayer.mmssss(Math.floor(e.current_position)),
+        duration: this.audioRecorderPlayer.mmssss(Math.floor(e.duration)),
+      });
+      return;
+    });
+  }
+  
+  onPausePlay = async () => {
+    await this.audioRecorderPlayer.pausePlayer();
+  }
+  
+  onStopPlay = async () => {
+    console.log('onStopPlay');
+    this.audioRecorderPlayer.stopPlayer();
+    this.audioRecorderPlayer.removePlayBackListener();
+  }
+  
 }
+
+
 
 function ResultRender({question, voice}) {
   const diff = new Diff();

@@ -13,10 +13,15 @@ import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 interface Props {}
 interface State {
   isRecord: boolean;
+  isRecordB: boolean;
   voice: string;
   question: string;
   total: number;
   selectedSpeed: number;
+  recordSecs: any; 
+  recordTime: any;
+  currentPositionSec: any;
+  currentDurationSec: any;
 }
 export default class App extends React.Component<Props, State> {
   audioRecorderPlayer = new AudioRecorderPlayer();
@@ -26,10 +31,15 @@ export default class App extends React.Component<Props, State> {
 
     this.state = {
       isRecord: false,
+      isRecordB: false,
       voice: "",
       question: "",
       total: 0,
       selectedSpeed: 0.6,
+      recordSecs: 0,
+      recordTime: 0,
+      currentPositionSec: 0,
+      currentDurationSec: 0
     };
 
     Voice.onSpeechStart = this._onSpeechStart;
@@ -46,9 +56,12 @@ export default class App extends React.Component<Props, State> {
   }
 
   render() {
-    const { isRecord, question, voice, total, selectedSpeed } = this.state;
+    const { isRecord, isRecordB, question, voice, total, selectedSpeed } = this.state;
     const buttonLabel = isRecord ? "중지" : "읽기평가";
     const buttonIcon = isRecord ? "mic-off" : "mic";
+    const buttonLabelB = isRecordB ? "중지" : "녹음";
+    const buttonIconB = isRecordB ? "mic-off" : "mic";
+    const eventB = isRecordB ? this.onStartRecord : this.onStopRecord; 
     const voiceLabel = voice
       ? voice
       : isRecord
@@ -104,17 +117,17 @@ export default class App extends React.Component<Props, State> {
           <View style={styles.button}>
             <Button
               primary
-              icon="radio"
-              onPress={this.onStartRecord}
-              text="녹음하기"
+              icon={buttonIcon}
+              onPress={this._onRecordVoice}
+              text={buttonLabel}
             />
           </View>
           <View style={styles.button}>
             <Button
               primary
-              icon="radio"
-              onPress={this.onStopRecord}
-              text="녹음정지"
+              icon={buttonIconB}
+              onPress={this.onRecordButton}
+              text={buttonLabelB}
             />
           </View>
           <View style={styles.button}>
@@ -122,17 +135,10 @@ export default class App extends React.Component<Props, State> {
               primary
               icon="radio"
               onPress={this.onStartPlay}
-              text="재생"
+              text="녹음듣기"
             />
           </View>
-          <View style={styles.button}>
-            <Button
-              primary
-              icon={buttonIcon}
-              onPress={this._onRecordVoice}
-              text={buttonLabel}
-            />
-          </View>
+
         </View>
       </Card>
     );
@@ -150,7 +156,6 @@ export default class App extends React.Component<Props, State> {
   };
   private _onSpeechEnd = event => {
     console.log("onSpeechEnd");
-
   };
   private _onSpeechResults = event => {
     console.log("onSpeechResults");
@@ -211,6 +216,17 @@ export default class App extends React.Component<Props, State> {
     Tts.addEventListener("tts-cancel", event => console.log("cancel", event));
   };
 
+  private onRecordButton = async () => {
+    const { isRecordB } = this.state;
+    if (isRecordB) {
+      this.onStopRecord();
+    } else {
+     this.onStartRecord();
+    }
+    this.setState({
+      isRecordB: !isRecordB
+    });
+  }
   onStartRecord = async () => {
     const result = await this.audioRecorderPlayer.startRecorder();
     this.audioRecorderPlayer.addRecordBackListener((e) => {
@@ -230,6 +246,7 @@ export default class App extends React.Component<Props, State> {
       recordSecs: 0,
     });
     console.log(result);
+
   }
   
   onStartPlay = async () => {
@@ -243,9 +260,7 @@ export default class App extends React.Component<Props, State> {
       }
       this.setState({
         currentPositionSec: e.current_position,
-        currentDurationSec: e.duration,
-        playTime: this.audioRecorderPlayer.mmssss(Math.floor(e.current_position)),
-        duration: this.audioRecorderPlayer.mmssss(Math.floor(e.duration)),
+        currentDurationSec: e.duration
       });
       return;
     });

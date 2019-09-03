@@ -12,3 +12,11 @@ react-native bundle --platform android --dev false --entry-file index.js --bundl
 ## Run
 
 - `yarn android`
+
+## Fix
+
+https://github.com/react-native-community/react-native-voice/issues/190
+
+```
+https://github.com/react-native-community/react-native-voice/issues/190
+```

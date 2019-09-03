@@ -141,9 +141,14 @@ android {
 }
 
 dependencies {
+    implementation "androidx.core:core:1.0.2"
+    implementation "androidx.annotation:annotation:1.1.0"
+    implementation project(':react-native-voice')
+    implementation project(':react-native-tts')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
+    
 }
 
 // Run this once to be able to run the application with BUCK

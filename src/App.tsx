@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Speech from './Speech';
 import Tts from './Tts';
+import Permissions from 'react-native-permissions';
 
 import styled from 'styled-components/native';
 const Container = styled.View`
@@ -27,6 +28,25 @@ const uiTheme = {
 };
 
 export default class Main extends Component {
+  componentDidMount () {
+    // this.loadInitialState();
+    console.log('PerMission Check')
+    this._requestPermission();
+  }
+    // Request permission to access photos
+  _requestPermission = async () => {
+    await Permissions.request('microphone').then(response => {
+      // Returns once the user has chosen to 'allow' or to 'not allow' access
+      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+      this.setState({microphonePermission: response});
+    });
+    await Permissions.request('storage').then(response => {
+      // Returns once the user has chosen to 'allow' or to 'not allow' access
+      // Response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
+      this.setState({storagePermission: response});
+    });
+  };
+    
   render() {
     return (
       <ThemeContext.Provider value={getTheme(uiTheme)}>

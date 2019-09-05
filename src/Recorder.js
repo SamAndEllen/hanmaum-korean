@@ -51,3 +51,4 @@ onStopPlay = async () => {
   this.audioRecorderPlayer.stopPlayer();
   this.audioRecorderPlayer.removePlayBackListener();
 }
+
